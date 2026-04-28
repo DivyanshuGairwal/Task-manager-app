@@ -50,7 +50,7 @@ router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
 
 // Update a project
 router.put('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { title, description } = req.body;
 
   try {
@@ -76,7 +76,7 @@ router.put('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
 
 // Delete a project
 router.delete('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   try {
     const project = await prisma.project.findFirst({
@@ -98,7 +98,7 @@ router.delete('/:id', async (req: AuthRequest, res: Response): Promise<void> => 
 
 // Get tasks for a specific project
 router.get('/:projectId/tasks', async (req: AuthRequest, res: Response): Promise<void> => {
-  const { projectId } = req.params;
+  const projectId = req.params.projectId as string;
   const { status } = req.query; // Optional filter
 
   try {
@@ -129,7 +129,7 @@ router.get('/:projectId/tasks', async (req: AuthRequest, res: Response): Promise
 
 // Create a task for a specific project
 router.post('/:projectId/tasks', async (req: AuthRequest, res: Response): Promise<void> => {
-  const { projectId } = req.params;
+  const projectId = req.params.projectId as string;
   const { title, dueDate } = req.body;
 
   if (!title) {

@@ -8,7 +8,7 @@ router.use(authenticateToken);
 
 // Update a task (status, title, dueDate)
 router.put('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { title, status, dueDate } = req.body;
 
   try {
@@ -45,7 +45,7 @@ router.put('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
 
 // Delete a task
 router.delete('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   try {
     const task = await prisma.task.findFirst({
