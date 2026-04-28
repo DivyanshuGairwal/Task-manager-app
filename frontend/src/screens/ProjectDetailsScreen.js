@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchTasks, createTask, updateTask, deleteTask } from '../store/slices/tasksSlice';
 import { useTheme } from '@react-navigation/native';
 import TaskItem from '../components/TaskItem';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from '@expo/vector-icons/Feather';
 
 export default function ProjectDetailsScreen({ route, navigation }) {
   const { project } = route.params;

@@ -5,7 +5,7 @@ import { fetchProjects, createProject, deleteProject, updateProject } from '../s
 import { logout } from '../store/slices/authSlice';
 import { useTheme } from '@react-navigation/native';
 import ProjectCard from '../components/ProjectCard';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from '@expo/vector-icons/Feather';
 
 export default function ProjectsScreen({ navigation }) {
   const dispatch = useDispatch();
