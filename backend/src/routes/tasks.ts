@@ -1,73 +1,65 @@
-import { Router, Response } from 'express';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
-import prisma from '../prisma';
+import { Router, Request, Response } from 'express';
 
 const router = Router();
 
-router.use(authenticateToken);
+// In-memory task storage
+interface Task {
+  id: string;
+  title: string;
+  status: 'PENDING' | 'COMPLETED';
+  dueDate: Date | null;
+  projectId: string;
+  createdAt: Date;
+}
+export const tasks: Task[] = [];
 
-// Update a task (status, title, dueDate)
-router.put('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
-  const id = req.params.id as string;
+// Create a new task
+router.post('/', async (req: Request, res: Response): Promise<void> => {
+  const { title, projectId, dueDate } = req.body;
+  
+  const newTask: Task = {
+    id: Math.random().toString(36).substr(2, 9),
+    title,
+    status: 'PENDING',
+    projectId,
+    dueDate: dueDate ? new Date(dueDate) : null,
+    createdAt: new Date(),
+  };
+
+  tasks.push(newTask);
+  res.status(201).json(newTask);
+});
+
+// Update a task
+router.put('/:id', async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
   const { title, status, dueDate } = req.body;
 
-  try {
-    // Ensure task belongs to a project owned by the user
-    const task = await prisma.task.findFirst({
-      where: {
-        id,
-        project: {
-          userId: req.user!.id,
-        },
-      },
-    });
-
-    if (!task) {
-      res.status(404).json({ error: 'Task not found' });
-      return;
-    }
-
-    const updateData: any = {};
-    if (title !== undefined) updateData.title = title;
-    if (status !== undefined) updateData.status = status;
-    if (dueDate !== undefined) updateData.dueDate = dueDate ? new Date(dueDate) : null;
-
-    const updatedTask = await prisma.task.update({
-      where: { id },
-      data: updateData,
-    });
-    res.json(updatedTask);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+  const task = tasks.find(t => t.id === id);
+  if (!task) {
+    res.status(404).json({ error: 'Task not found' });
+    return;
   }
+
+  if (title !== undefined) task.title = title;
+  if (status !== undefined) task.status = status;
+  if (dueDate !== undefined) task.dueDate = dueDate ? new Date(dueDate) : null;
+
+  res.json(task);
 });
 
 // Delete a task
-router.delete('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
-  const id = req.params.id as string;
-
-  try {
-    const task = await prisma.task.findFirst({
-      where: {
-        id,
-        project: {
-          userId: req.user!.id,
-        },
-      },
-    });
-
-    if (!task) {
-      res.status(404).json({ error: 'Task not found' });
-      return;
-    }
-
-    await prisma.task.delete({ where: { id } });
-    res.json({ message: 'Task deleted successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const index = tasks.findIndex(t => t.id === id);
+  
+  if (index === -1) {
+    res.status(404).json({ error: 'Task not found' });
+    return;
   }
+
+  tasks.splice(index, 1);
+  res.status(204).send();
 });
 
 export default router;

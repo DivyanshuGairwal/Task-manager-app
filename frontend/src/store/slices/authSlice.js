@@ -19,7 +19,9 @@ export const verifyOtp = createAsyncThunk(
   async ({ phone, otp }, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/verify-otp', { phone, otp });
-      await AsyncStorage.setItem('userToken', response.data.token);
+      if (AsyncStorage && typeof AsyncStorage.setItem === 'function') {
+        await AsyncStorage.setItem('userToken', response.data.token);
+      }
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to verify OTP');
@@ -28,7 +30,13 @@ export const verifyOtp = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-  await AsyncStorage.removeItem('userToken');
+  try {
+    if (AsyncStorage && typeof AsyncStorage.removeItem === 'function') {
+      await AsyncStorage.removeItem('userToken');
+    }
+  } catch (e) {
+    console.warn('Logout storage error:', e);
+  }
 });
 
 const initialState = {

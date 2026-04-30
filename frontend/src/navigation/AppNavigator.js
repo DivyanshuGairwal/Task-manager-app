@@ -21,12 +21,14 @@ export default function AppNavigator() {
   useEffect(() => {
     const bootstrapAsync = async () => {
       try {
-        const userToken = await AsyncStorage.getItem('userToken');
-        if (userToken) {
-          dispatch(setToken(userToken));
+        if (AsyncStorage && typeof AsyncStorage.getItem === 'function') {
+          const userToken = await AsyncStorage.getItem('userToken');
+          if (userToken) {
+            dispatch(setToken(userToken));
+          }
         }
       } catch (e) {
-        console.error('Failed to restore token', e);
+        console.warn('AsyncStorage not available:', e);
       }
       setIsReady(true);
     };

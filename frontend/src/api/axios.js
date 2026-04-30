@@ -1,9 +1,11 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { Platform } from 'react-native';
+
 const api = axios.create({
-  // Use 10.0.2.2 for Android Emulator, localhost for iOS/Web, or your local network IP for physical device
-  baseURL: 'http://10.0.2.2:5000/api', 
+  // Use your computer's local IP address so the physical phone can connect
+  baseURL: 'http://10.12.8.105:5000/api',
 });
 
 api.interceptors.request.use(
